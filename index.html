@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>D.A.B.S.y</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app-container">
+    <header class="hud-header">
+      <div class="status-pill">
+        <span id="mood-indicator" class="dot"></span>
+        <span id="state-label">IDLE</span>
+      </div>
+      <div class="hud-controls">
+        <button id="vision-toggle" class="hud-btn" title="Toggle Vision">👁️ <span id="vision-status">OFF</span></button>
+        <button id="study-toggle" class="hud-btn" title="Toggle Study Mode">📚</button>
+        <button id="settings-btn" class="hud-btn" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <main id="creature-stage">
+      <canvas id="eye-canvas"></canvas>
+      <div id="subtitle-box" class="hidden"></div>
+      <video id="webcam-feed" autoplay playsinline muted class="hidden"></video>
+    </main>
+
+    <section id="study-panel" class="hidden">
+      <div class="study-header">
+        <h3>Study Companion</h3>
+        <button id="close-study" class="close-btn">&times;</button>
+      </div>
+      <div id="study-chat-history" class="study-chat"></div>
+      <div class="study-input-row">
+        <input type="text" id="study-input" placeholder="Ask D.A.B.S.y a concept or question...">
+        <button id="study-send" class="hud-btn">Send</button>
+        <button id="study-snap" class="hud-btn" title="Analyze image/work">📸</button>
+      </div>
+    </section>
+
+    <footer class="interaction-bar">
+      <button id="mic-btn" class="action-btn" title="Voice Input">🎤</button>
+      <div class="creature-info">D.A.B.S.y v1.0</div>
+      <button id="pet-btn" class="action-btn" title="Interact">🐾</button>
+    </footer>
+  </div>
+
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>D.A.B.S.y Settings</h3>
+      <label>AI API Provider:</label>
+      <select id="ai-provider">
+        <option value="gemini">Google Gemini</option>
+        <option value="openai">OpenAI GPT</option>
+        <option value="local">Local Simulation (No Key)</option>
+      </select>
+      <label>API Key:</label>
+      <input type="password" id="api-key-input" placeholder="Enter API key...">
+      <div class="modal-buttons">
+        <button id="save-settings" class="hud-btn primary">Save</button>
+        <button id="close-settings" class="hud-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="ai.js"></script>
+  <script src="voice.js"></script>
+  <script src="vision.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
+
