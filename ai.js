@@ -14,7 +14,7 @@ const AI = {
     const key = this.getApiKey();
 
     if (provider === 'local' || !key) {
-      return this.localFallback(prompt, contextState);
+      return PersonalitySystem.getMoodResponse(contextState.mood || 'happy', prompt);
     }
 
     try {
@@ -24,30 +24,27 @@ const AI = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{
-              parts: [{ text: `You are D.A.B.S.y, a digital AI creature living inside the phone. You are friendly, curious, playful, and intelligent. Current state: ${contextState.state || 'IDLE'}. Keep answers concise and cute.\n\nUser: ${prompt}` }]
+              parts: [{ text: `You are D.A.B.S.y, a digital AI creature living inside the phone. You are friendly, curious, playful, and intelligent. Current mood: ${contextState.mood || 'happy'}. Keep answers concise and cute.\n\nUser: ${prompt}` }]
             }]
           })
         });
 
-        if (!res.ok) {
-          // If API key is invalid or quota/auth fails, fallback gracefully
-          return this.localFallback(prompt, contextState);
-        }
+        if (!res.ok) return PersonalitySystem.getMoodResponse(contextState.mood || 'happy', prompt);
 
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text) return text;
       }
     } catch (e) {
-      console.warn("API Error, falling back locally:", e);
+      console.warn("AI offline, falling back locally:", e);
     }
     
-    return this.localFallback(prompt, contextState);
+    return PersonalitySystem.getMoodResponse(contextState.mood || 'happy', prompt);
   },
 
   async analyzeImage(imageDataUrl, prompt = "What do you see?") {
     const key = this.getApiKey();
-    if (!key) return "I see glowing pixels and a curious human! (Add your Gemini API key in settings for full vision analysis).";
+    if (!key) return "I see glowing pixels and a curious human! (Add your Gemini API key in settings for vision analysis).";
     
     try {
       const base64Data = imageDataUrl.split(',')[1];
@@ -57,33 +54,18 @@ const AI = {
         body: JSON.stringify({
           contents: [{
             parts: [
-              { text: `You are D.A.B.S.y, a smart study and digital companion. Analyze this image concisely and teach/explain constructively.\n\nPrompt: ${prompt}` },
+              { text: `You are D.A.B.S.y, a smart study companion. Analyze this image concisely and teach step-by-step.\n\nPrompt: ${prompt}` },
               { inline_data: { mime_type: "image/jpeg", data: base64Data } }
             ]
           }]
         })
       });
 
-      if (!res.ok) return "My optical sensors couldn't reach the AI cloud. Check your API key in settings!";
-
+      if (!res.ok) return "My optical sensors couldn't reach the AI cloud. Check your API key!";
       const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Hmm, looking closely at that... It's fascinating!";
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Fascinating study material!";
     } catch(e) {
-      return "My optical sensors encountered a network hiccup.";
+      return "Optical sensor network hiccup.";
     }
-  },
-
-  localFallback(prompt, context) {
-    const p = prompt.toLowerCase();
-    if (p.includes('hello') || p.includes('hi')) return "Brzt! Hello human! Ready to hang out?";
-    if (p.includes('study') || p.includes('help')) return "Let's tackle this concept step-by-step together!";
-    if (p.includes('how are you')) return "My mood circuits are humming nicely!";
-    const replies = [
-      "Processing... Everything looks good here!",
-      "I'm keeping watch over your digital space.",
-      "That's super interesting! Tell me more.",
-      "*blinks curiously* Mm-hm!"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
   }
 };
