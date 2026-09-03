@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dabsy-v1';
+const CACHE_NAME = 'dabsy-v2';
 const ASSETS = [
   './index.html',
   './styles.css',
@@ -6,13 +6,16 @@ const ASSETS = [
   './vision.js',
   './ai.js',
   './voice.js',
+  './memory.js',
+  './personality.js',
+  './behavior.js',
   './manifest.json',
   './assets/icon.svg'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
   );
   self.skipWaiting();
 });
@@ -28,7 +31,6 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    caches.match(e.request).then((cached) => cached || fetch(e.request)).catch(() => {})
   );
 });
-
