@@ -6,8 +6,8 @@ const AI = {
     return localStorage.getItem('dabsy_provider') || 'local';
   },
   setSettings(provider, key) {
-    localStorage.setItem('dabsy_provider', provider);
-    localStorage.setItem('dabsy_api_key', key);
+    localStorage.setItem('dabsy_provider', provider.trim());
+    localStorage.setItem('dabsy_api_key', key.trim());
   },
   async query(prompt, contextState = {}) {
     const provider = this.getProvider();
@@ -28,18 +28,26 @@ const AI = {
             }]
           })
         });
+
+        if (!res.ok) {
+          // If API key is invalid or quota/auth fails, fallback gracefully
+          return this.localFallback(prompt, contextState);
+        }
+
         const data = await res.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Bip! My circuits got a bit dizzy.";
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
       }
     } catch (e) {
       console.warn("API Error, falling back locally:", e);
     }
+    
     return this.localFallback(prompt, contextState);
   },
 
   async analyzeImage(imageDataUrl, prompt = "What do you see?") {
     const key = this.getApiKey();
-    if (!key) return "I see glowing pixels and a curious human!";
+    if (!key) return "I see glowing pixels and a curious human! (Add your Gemini API key in settings for full vision analysis).";
     
     try {
       const base64Data = imageDataUrl.split(',')[1];
@@ -55,10 +63,13 @@ const AI = {
           }]
         })
       });
+
+      if (!res.ok) return "My optical sensors couldn't reach the AI cloud. Check your API key in settings!";
+
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text || "Hmm, looking closely at that... It's fascinating!";
     } catch(e) {
-      return "My optical sensors couldn't process that clearly right now.";
+      return "My optical sensors encountered a network hiccup.";
     }
   },
 
