@@ -24,13 +24,19 @@ const VisionSystem = {
 
   async start() {
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        alert("Camera API not supported in this environment.");
+        return false;
+      }
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
         audio: false
       });
-      this.videoEl.srcObject = this.stream;
+      if (this.videoEl) {
+        this.videoEl.srcObject = this.stream;
+      }
       this.active = true;
-      this.startMotionDetection();
+      this.startMotionLoop();
       return true;
     } catch (e) {
       console.warn("Camera access denied or unavailable:", e);
@@ -46,34 +52,30 @@ const VisionSystem = {
     }
     this.active = false;
     if (this.videoEl) this.videoEl.srcObject = null;
-    if (this.onChangeCallback) this.onChangeCallback('AWAY');
+    if (this.onChangeCallback) this.onChangeCallback('AWAY', 'sleepy');
   },
 
-  startMotionDetection() {
+  startMotionLoop() {
     if (!this.active) return;
-    
     setTimeout(() => {
       if (!this.active) return;
-      if (this.videoEl.videoWidth > 0) {
+      if (this.videoEl && this.videoEl.videoWidth > 0) {
         this.canvas.width = 160;
         this.canvas.height = 120;
         this.ctx.drawImage(this.videoEl, 0, 0, 160, 120);
-        
-        // Notify state machine that human presence / activity is detected
         if (this.onChangeCallback) {
-          this.onChangeCallback('WATCHING');
+          this.onChangeCallback('WATCHING', 'curious');
         }
       }
-      this.startMotionDetection();
-    }, 3000);
+      this.startMotionLoop();
+    }, 4000);
   },
 
   captureSnapshot() {
-    if (!this.active || this.videoEl.videoWidth === 0) return null;
+    if (!this.active || !this.videoEl || this.videoEl.videoWidth === 0) return null;
     this.canvas.width = this.videoEl.videoWidth;
     this.canvas.height = this.videoEl.videoHeight;
     this.ctx.drawImage(this.videoEl, 0, 0);
     return this.canvas.toDataURL('image/jpeg', 0.8);
   }
 };
-
