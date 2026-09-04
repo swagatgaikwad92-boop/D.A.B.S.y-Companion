@@ -1,45 +1,61 @@
 const MemorySystem = {
   data: {
-    profile: { name: "Human", style: "balanced", goals: [] },
-    study: { subjects: {}, weakAreas: [], streak: 0, completedTopics: [] },
+    profile: { name: "Human", style: "balanced", goals: [], streak: 0, lastActive: Date.now() },
+    study: { subjects: {}, weakAreas: [], completedTopics: [] },
+    projects: [],
     tasks: [],
     conversations: [],
-    preferences: { voiceEnabled: true, theme: "dark" }
+    preferences: { voiceEnabled: true, personality: "balanced", isPremium: false }
   },
 
   init() {
-    const saved = localStorage.getItem('dabsy_v2_memory');
+    const saved = localStorage.getItem('dabsy_v4_memory');
     if (saved) {
       try { this.data = JSON.parse(saved); } catch(e) {}
     }
   },
 
   save() {
-    localStorage.setItem('dabsy_v2_memory', JSON.stringify(this.data));
+    localStorage.setItem('dabsy_v4_memory', JSON.stringify(this.data));
   },
 
-  getProfile(key) { return this.data.profile[key]; },
+  get(key) { return this.data[key]; },
   setProfile(key, val) { this.data.profile[key] = val; this.save(); },
 
   addTask(task) {
-    this.data.tasks.push({ id: Date.now(), completed: false, ...task });
+    const entry = { id: Date.now(), completed: false, priority: 'medium', category: 'General', ...task };
+    this.data.tasks.push(entry);
     this.save();
+    return entry;
   },
 
-  getPendingTasks() {
-    return this.data.tasks.filter(t => !t.completed);
+  completeTask(id) {
+    const t = this.data.tasks.find(x => x.id === id);
+    if (t) {
+      t.completed = true;
+      this.data.profile.streak++;
+      this.save();
+    }
+    return t;
+  },
+
+  addProject(name, details = {}) {
+    const p = { id: Date.now(), name, details, notes: [], tasks: [], createdAt: Date.now() };
+    this.data.projects.push(p);
+    this.save();
+    return p;
   },
 
   logConversation(role, text) {
     this.data.conversations.push({ role, text, timestamp: Date.now() });
-    if (this.data.conversations.length > 30) this.data.conversations.shift();
+    if (this.data.conversations.length > 50) this.data.conversations.shift();
     this.save();
   },
 
-  exportMemory() { return JSON.stringify(this.data, null, 2); },
-  importMemory(jsonString) {
+  export() { return JSON.stringify(this.data, null, 2); },
+  import(jsonStr) {
     try {
-      this.data = JSON.parse(jsonString);
+      this.data = JSON.parse(jsonStr);
       this.save();
       return true;
     } catch(e) { return false; }
