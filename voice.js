@@ -4,60 +4,46 @@ const VoiceSystem = {
   isListening: false,
 
   init(onResult) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
       try {
-        this.recognition = new SpeechRecognition();
-        this.recognition.continuous = false;
-        this.recognition.interimResults = false;
+        this.recognition = new SR();
         this.recognition.lang = 'en-US';
-
-        this.recognition.onresult = (event) => {
-          const text = event.results[0][0].transcript;
+        this.recognition.onresult = (e) => {
           this.isListening = false;
-          if (onResult) onResult(text);
+          if (onResult) onResult(e.results[0][0].transcript);
         };
         this.recognition.onerror = () => { this.isListening = false; };
         this.recognition.onend = () => { this.isListening = false; };
-      } catch (e) {}
+      } catch(e) {}
     }
   },
 
   listen() {
-    if (!this.recognition) {
-      alert("Speech recognition is not supported in this browser.");
-      return false;
-    }
+    if (!this.recognition) return false;
     if (this.isListening) {
       this.recognition.stop();
       this.isListening = false;
       return false;
-    } else {
-      try {
-        this.recognition.start();
-        this.isListening = true;
-        return true;
-      } catch(e) {
-        this.isListening = false;
-        return false;
-      }
+    }
+    try {
+      this.recognition.start();
+      this.isListening = true;
+      return true;
+    } catch(e) {
+      this.isListening = false;
+      return false;
     }
   },
 
-  speak(text, onEnd) {
-    if (!this.synth) {
-      if (onEnd) onEnd();
-      return;
-    }
+  speak(text) {
+    if (!this.synth) return;
     try {
       this.synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.pitch = 1.4;
-      utterance.rate = 1.1;
-      utterance.onend = () => { if (onEnd) onEnd(); };
-      this.synth.speak(utterance);
-    } catch(e) {
-      if (onEnd) onEnd();
-    }
+      const u = new SpeechSynthesisUtterance(text);
+      u.pitch = 1.3;
+      u.rate = 1.1;
+      this.synth.speak(u);
+    } catch(e) {}
   }
 };
