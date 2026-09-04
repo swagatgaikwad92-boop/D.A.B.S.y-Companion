@@ -22,7 +22,6 @@
       overflow: hidden;
     }
 
-    /* Cinematic Atmospheric Depth */
     #atmosphere {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -39,14 +38,13 @@
       transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Cinematic Subtitles */
     #subtitle-box {
       position: absolute;
       bottom: 14%;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: rgba(10, 14, 22, 0.75);
-      border: 1px solid rgba(0, 242, 254, 0.18);
+      background: rgba(10, 14, 22, 0.8);
+      border: 1px solid rgba(0, 242, 254, 0.25);
       padding: 14px 28px;
       border-radius: 20px;
       font-size: 15px;
@@ -66,7 +64,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Floating Bubble Menu (Double-Tap Gateway) */
+    /* Floating Bubble Menu */
     #bubble-menu {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -75,8 +73,8 @@
       justify-content: center;
       align-items: center;
       pointer-events: none;
-      opacity: 0.05;
-      transition: opacity 0.5s ease;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
 
     #bubble-menu.active {
@@ -92,8 +90,8 @@
 
     .action-bubble {
       position: absolute;
-      background: rgba(12, 18, 28, 0.9);
-      border: 1px solid rgba(0, 242, 254, 0.35);
+      background: rgba(12, 18, 28, 0.92);
+      border: 1px solid rgba(0, 242, 254, 0.4);
       color: #fff;
       padding: 14px 22px;
       border-radius: 32px;
@@ -102,7 +100,7 @@
       letter-spacing: 0.5px;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 12px 36px rgba(0, 242, 254, 0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+      box-shadow: 0 12px 36px rgba(0, 242, 254, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -113,11 +111,10 @@
 
     .action-bubble:active {
       transform: scale(0.95) translate(-50%, -50%) !important;
-      background: rgba(0, 242, 254, 0.25);
+      background: rgba(0, 242, 254, 0.3);
       border-color: #00f2fe;
     }
 
-    /* Constellation Coordinates */
     .bubble-study { top: -15%; left: 50%; transition-delay: 0.04s; }
     .bubble-topics { top: 25%; left: 95%; transition-delay: 0.08s; }
     .bubble-tasks { top: 85%; left: 80%; transition-delay: 0.12s; }
@@ -128,11 +125,11 @@
       transform: scale(1) translate(-50%, -50%);
     }
 
-    /* Smart Mode Modals (Study, Tasks, Room, Settings, Topics) */
+    /* Smart Modals */
     .smart-modal {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(4, 6, 10, 0.92);
+      background: rgba(4, 6, 10, 0.95);
       backdrop-filter: blur(20px);
       z-index: 100;
       display: flex;
@@ -140,7 +137,7 @@
       padding: 24px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
     }
 
     .smart-modal.active {
@@ -179,13 +176,13 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       padding-bottom: 20px;
     }
 
     .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
       padding: 16px;
       border-radius: 16px;
       font-size: 14px;
@@ -200,8 +197,8 @@
 
     .input-row input {
       flex: 1;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
       padding: 12px 16px;
       border-radius: 12px;
       color: #fff;
@@ -220,7 +217,6 @@
       cursor: pointer;
     }
 
-    /* Shift Canvas Upwards when menus open */
     body.menu-open #dabsy-canvas {
       transform: translateY(-15vh) scale(0.65);
     }
@@ -246,14 +242,14 @@
   <!-- Smart Modals -->
   <div id="modal-study" class="smart-modal">
     <div class="modal-header">
-      <h2>D.A.B.S.y Adaptive Tutor</h2>
+      <h2>D.A.B.S.y Adaptive Socratic Tutor</h2>
       <button class="close-btn" onclick="App.closeModes()">&times;</button>
     </div>
     <div class="modal-body" id="study-chat-history">
-      <div class="card"><strong>D.A.B.S.y:</strong> Let's build your PCMB concepts from zero. What concept or chapter are we tackling today?</div>
+      <div class="card"><strong>D.A.B.S.y:</strong> Let's build your PCMB concepts from zero. What chapter or problem are we working on?</div>
     </div>
     <div class="input-row">
-      <input type="text" id="study-input" placeholder="Ask a question or name a topic...">
+      <input type="text" id="study-input" placeholder="Ask a question or concept...">
       <button class="btn" onclick="App.sendStudyQuery()">Send</button>
     </div>
   </div>
@@ -263,11 +259,9 @@
       <h2>Active Tasks & Goals</h2>
       <button class="close-btn" onclick="App.closeModes()">&times;</button>
     </div>
-    <div class="modal-body" id="task-list-container">
-      <!-- Dynamically populated -->
-    </div>
+    <div class="modal-body" id="task-list-container"></div>
     <div class="input-row">
-      <input type="text" id="new-task-input" placeholder="Add new task or reminder...">
+      <input type="text" id="new-task-input" placeholder="Add new task...">
       <button class="btn" onclick="App.addNewTask()">Add</button>
     </div>
   </div>
@@ -279,21 +273,21 @@
     </div>
     <div class="modal-body">
       <div class="card">🪴 <strong>Study Plant:</strong> Thriving (Streak: <span id="streak-count">4</span> days)</div>
-      <div class="card">📚 <strong>PCMB Focus:</strong> Physics (Current Electricity & Magnetism)</div>
-      <div class="card">💻 <strong>Active Project:</strong> Mentorly Ed-Tech Dashboard</div>
+      <div class="card">📚 <strong>PCMB Focus:</strong> Physics, Chemistry, Math & Biology</div>
+      <div class="card">💻 <strong>Active Project:</strong> Mentorly Dashboard & D.A.B.S.y Companion</div>
     </div>
   </div>
 
   <div id="modal-topics" class="smart-modal">
     <div class="modal-header">
-      <h2>Study Topics & Quick Revision</h2>
+      <h2>Quick PCMB Revision Topics</h2>
       <button class="close-btn" onclick="App.closeModes()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="card" onclick="App.quickTopic('Current Electricity')">⚡ <strong>Physics:</strong> Current Electricity & Ohm's Law</div>
       <div class="card" onclick="App.quickTopic('Chemical Bonding')">🧪 <strong>Chemistry:</strong> Chemical Bonding & Molecular Structure</div>
-      <div class="card" onclick="App.quickTopic('Calculus Basics')">📐 <strong>Mathematics:</strong> Limits & Derivatives</div>
-      <div class="card" onclick="App.quickTopic('Cell Cycle')">🧬 <strong>Biology:</strong> Cell Cycle and Cell Division</div>
+      <div class="card" onclick="App.quickTopic('Calculus Limits')">📐 <strong>Mathematics:</strong> Limits & Derivatives</div>
+      <div class="card" onclick="App.quickTopic('Cell Cycle')">🧬 <strong>Biology:</strong> Cell Cycle & Cell Division</div>
     </div>
   </div>
 
@@ -307,7 +301,7 @@
         <label>AI Provider:</label>
         <select id="ai-provider" style="width:100%; margin-top:8px; background:#000; color:#fff; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);">
           <option value="gemini">Google Gemini AI</option>
-          <option value="local">Local Companion Engine</option>
+          <option value="local">Local Socratic Companion</option>
         </select>
       </div>
       <div class="card">
@@ -319,7 +313,7 @@
   </div>
 
   <script>
-    // --- 1. PERSISTENT MEMORY & STATE ---
+    // --- 1. MEMORY & DATA SYSTEM ---
     const Memory = {
       data: {
         profile: { name: "Swagat", streak: 4 },
@@ -452,20 +446,69 @@
       }
     }
 
-    // --- 4. BEHAVIOR ENGINE ---
+    // --- 4. BEHAVIOR ENGINE & SPEECH RECOGNITION ---
     class DabsyBehavior {
       constructor(eyes) {
         this.eyes = eyes;
         this.state = 'IDLE';
         this.lifeLoop();
         this.breathingLoop();
+        this.initSpeechRecognition();
+      }
+
+      initSpeechRecognition() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+          this.recognition = new SpeechRec();
+          this.recognition.continuous = false;
+          this.recognition.interimResults = false;
+          this.recognition.lang = 'en-US';
+
+          this.recognition.onresult = async (event) => {
+            const transcript = event.results[0][0].transcript;
+            App.speak(`You said: "${transcript}"`);
+            this.setState('THINKING');
+            
+            // Process voice input through smart study or general intelligence
+            setTimeout(() => {
+              App.openMode('study');
+              document.getElementById('study-input').value = transcript;
+              App.sendStudyQuery();
+            }, 1000);
+          };
+
+          this.recognition.onerror = () => {
+            this.setState('IDLE');
+          };
+
+          this.recognition.onend = () => {
+            if (this.state === 'LISTENING') {
+              this.setState('IDLE');
+            }
+          };
+        }
+      }
+
+      startListening() {
+        if (this.recognition) {
+          try {
+            this.setState('LISTENING');
+            this.eyes.bloom.target = 1.6;
+            this.recognition.start();
+            App.speak("Listening... 🎤 Speak now.");
+          } catch(e) {
+            this.setState('IDLE');
+          }
+        } else {
+          App.speak("Voice input is not supported in this browser.");
+        }
       }
 
       setState(newState) {
         this.state = newState;
-        if (newState === 'THINKING') {
+        if (newState === 'THINKING' || newState === 'LISTENING') {
           this.eyes.squash.target = 0.85; 
-          this.eyes.bloom.target = 1.35;
+          this.eyes.bloom.target = 1.4;
         } else if (newState === 'HAPPY') {
           this.eyes.squash.target = 0.7; 
           this.eyes.blink.target = 0.8;
@@ -482,7 +525,7 @@
       triggerBlink() {
         this.eyes.blink.target = 0.05;
         setTimeout(() => {
-          if (this.state !== 'SLEEPY') this.eyes.blink.target = 1;
+          if (this.state !== 'SLEEPY' && this.state !== 'LISTENING') this.eyes.blink.target = 1;
         }, 110);
       }
 
@@ -525,7 +568,7 @@
       }
     }
 
-    // --- 5. MAIN APPLICATION CONTROLLER ---
+    // --- 5. APP CONTROLLER & FULL ACTIONS ---
     const App = {
       init() {
         const canvas = document.getElementById('dabsy-canvas');
@@ -535,6 +578,7 @@
         this.isMenuOpen = false;
         this.lastTap = 0;
         this.tapTimer = null;
+        this.pressTimer = null;
 
         this.setupInteractions();
         this.loop();
@@ -549,7 +593,15 @@
       setupInteractions() {
         const canvas = document.getElementById('dabsy-canvas');
         
+        // Tap and Hold (Long Press) to listen via voice
+        canvas.addEventListener('pointerdown', (e) => {
+          this.pressTimer = setTimeout(() => {
+            this.behavior.startListening();
+          }, 650); // Hold for 650ms to trigger listening
+        });
+
         canvas.addEventListener('pointerup', (e) => {
+          clearTimeout(this.pressTimer);
           e.preventDefault();
           const now = Date.now();
           
@@ -567,56 +619,7 @@
           }
         });
 
-        // Load settings values into modal
         document.getElementById('ai-provider').value = Memory.data.provider;
         document.getElementById('api-key-input').value = Memory.data.apiKey;
         this.renderTasks();
-      },
-
-      toggleMenu() {
-        this.isMenuOpen = !this.isMenuOpen;
-        const menu = document.getElementById('bubble-menu');
-        
-        if (this.isMenuOpen) {
-          menu.classList.add('active');
-          this.behavior.setState('HAPPY');
-          this.speak("What are we focusing on?");
-        } else {
-          menu.classList.remove('active');
-          this.behavior.setState('IDLE');
-        }
-      },
-
-      openMode(modeName) {
-        this.toggleMenu();
-        document.body.classList.add('menu-open');
-        document.querySelectorAll('.smart-modal').forEach(m => m.classList.remove('active'));
-        document.getElementById(`modal-${modeName}`).classList.add('active');
-        this.behavior.setState('THINKING');
-      },
-
-      closeModes() {
-        document.body.classList.remove('menu-open');
-        document.querySelectorAll('.smart-modal').forEach(m => m.classList.remove('active'));
-        this.behavior.setState('IDLE');
-      },
-
-      async sendStudyQuery() {
-        const input = document.getElementById('study-input');
-        const history = document.getElementById('study-chat-history');
-        const q = input.value.trim();
-        if (!q) return;
-
-        history.innerHTML += `<div class="card"><strong>You:</strong> ${q}</div>`;
-        input.value = '';
-        history.scrollTop = history.scrollHeight;
-
-        this.behavior.setState('THINKING');
-        
-        let response = "";
-        const key = Memory.data.apiKey;
-        const provider = Memory.data.provider;
-
-        if (provider === 'gemini' && key) {
-          try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/
+      
