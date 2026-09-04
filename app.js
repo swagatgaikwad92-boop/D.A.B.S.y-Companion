@@ -2,6 +2,7 @@ const DabsyApp = {
   canvas: null,
   ctx: null,
   lastTapTime: 0,
+  tapTimeout: null,
 
   init() {
     this.canvas = document.getElementById('eye-canvas');
@@ -41,22 +42,29 @@ const DabsyApp = {
       this.speak(res.text);
     });
 
-    // Double tap detector on Canvas to open D.A.B.S.y World
-    this.canvas.addEventListener('touchend', () => this.handleTap());
-    this.canvas.addEventListener('click', () => this.handleTap());
+    // Use pointerup for unified, reliable touch and mouse handling without double-firing
+    this.canvas.addEventListener('pointerup', (e) => {
+      e.preventDefault();
+      this.handleTap();
+    });
   },
 
   handleTap() {
     const now = Date.now();
-    if (now - this.lastTapTime < 350) {
-      // Double tap detected! Open Expanded World Room
+    if (now - this.lastTapTime < 400) {
+      // Double tap detected! Clear single tap timeout and open expanded world
+      clearTimeout(this.tapTimeout);
+      this.lastTapTime = 0;
       this.openExpandedWorld();
     } else {
-      // Single tap pet reaction
-      StateManager.setMood('happy');
-      this.speak("👀");
+      this.lastTapTime = now;
+      // Buffer single tap slightly to allow double-tap detection without premature reaction
+      clearTimeout(this.tapTimeout);
+      this.tapTimeout = setTimeout(() => {
+        StateManager.setMood('happy');
+        this.speak("👀");
+      }, 400);
     }
-    this.lastTapTime = now;
   },
 
   openExpandedWorld() {
