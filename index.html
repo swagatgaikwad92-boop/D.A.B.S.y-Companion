@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>D.A.B.S.y</title>
+  <title>D.A.B.S.y Companion</title>
   <style>
     * {
       margin: 0;
@@ -22,12 +22,13 @@
       overflow: hidden;
     }
 
+    /* Cinematic Atmospheric Depth */
     #atmosphere {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #071018 0%, #030305 75%);
+      background: radial-gradient(circle at center, #071220 0%, #030305 75%);
       z-index: 0;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     #dabsy-canvas {
@@ -35,27 +36,29 @@
       top: 0; left: 0; width: 100%; height: 100%;
       z-index: 10;
       touch-action: none;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Cinematic Subtitles */
     #subtitle-box {
       position: absolute;
       bottom: 14%;
       left: 50%;
-      transform: translateX(-50%) translateY(15px);
+      transform: translateX(-50%) translateY(20px);
       background: rgba(10, 14, 22, 0.75);
-      border: 1px solid rgba(0, 242, 254, 0.15);
-      padding: 12px 24px;
-      border-radius: 18px;
+      border: 1px solid rgba(0, 242, 254, 0.18);
+      padding: 14px 28px;
+      border-radius: 20px;
       font-size: 15px;
       letter-spacing: 0.4px;
       text-align: center;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       opacity: 0;
       pointer-events: none;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 15;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
     }
 
     #subtitle-box.visible {
@@ -63,7 +66,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Floating Option Bubbles (Revealed on Double Tap) */
+    /* Floating Bubble Menu (Double-Tap Gateway) */
     #bubble-menu {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -72,8 +75,8 @@
       justify-content: center;
       align-items: center;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      opacity: 0.05;
+      transition: opacity 0.5s ease;
     }
 
     #bubble-menu.active {
@@ -83,52 +86,144 @@
 
     .bubble-constellation {
       position: relative;
-      width: 280px;
-      height: 280px;
+      width: 300px;
+      height: 300px;
     }
 
     .action-bubble {
       position: absolute;
-      background: rgba(12, 18, 28, 0.85);
-      border: 1px solid rgba(0, 242, 254, 0.3);
+      background: rgba(12, 18, 28, 0.9);
+      border: 1px solid rgba(0, 242, 254, 0.35);
       color: #fff;
-      padding: 12px 20px;
-      border-radius: 30px;
+      padding: 14px 22px;
+      border-radius: 32px;
       font-size: 14px;
       font-weight: 500;
       letter-spacing: 0.5px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 36px rgba(0, 242, 254, 0.18), inset 0 1px 0 rgba(255,255,255,0.12);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
-      transform: scale(0);
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+      gap: 10px;
+      transform: scale(0) translate(-50%, -50%);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, border-color 0.2s;
     }
 
     .action-bubble:active {
-      transform: scale(0.95) !important;
-      background: rgba(0, 242, 254, 0.2);
+      transform: scale(0.95) translate(-50%, -50%) !important;
+      background: rgba(0, 242, 254, 0.25);
+      border-color: #00f2fe;
     }
+
+    /* Constellation Coordinates */
+    .bubble-study { top: -15%; left: 50%; transition-delay: 0.04s; }
+    .bubble-topics { top: 25%; left: 95%; transition-delay: 0.08s; }
+    .bubble-tasks { top: 85%; left: 80%; transition-delay: 0.12s; }
+    .bubble-settings { top: 85%; left: 20%; transition-delay: 0.16s; }
+    .bubble-room { top: 25%; left: 5%; transition-delay: 0.2s; }
 
     #bubble-menu.active .action-bubble {
-      transform: scale(1);
+      transform: scale(1) translate(-50%, -50%);
     }
 
-    /* Position the floating bubbles in a constellation around the center */
-    .bubble-study { top: 0%; left: 50%; transform: translate(-50%, -50%) scale(0); transition-delay: 0.05s; }
-    .bubble-topics { top: 25%; left: 90%; transform: translate(-50%, -50%) scale(0); transition-delay: 0.1s; }
-    .bubble-tasks { top: 75%; left: 85%; transform: translate(-50%, -50%) scale(0); transition-delay: 0.15s; }
-    .bubble-settings { top: 75%; left: 15%; transform: translate(-50%, -50%) scale(0); transition-delay: 0.2s; }
-    .bubble-room { top: 25%; left: 10%; transform: translate(-50%, -50%) scale(0); transition-delay: 0.25s; }
+    /* Smart Mode Modals (Study, Tasks, Room, Settings, Topics) */
+    .smart-modal {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(4, 6, 10, 0.92);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
 
-    #bubble-menu.active .bubble-study { transform: translate(-50%, -50%) scale(1); }
-    #bubble-menu.active .bubble-topics { transform: translate(-50%, -50%) scale(1); }
-    #bubble-menu.active .bubble-tasks { transform: translate(-50%, -50%) scale(1); }
-    #bubble-menu.active .bubble-settings { transform: translate(-50%, -50%) scale(1); }
-    #bubble-menu.active .bubble-room { transform: translate(-50%, -50%) scale(1); }
+    .smart-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #00f2fe;
+    }
+
+    .close-btn {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-bottom: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .input-row input {
+      flex: 1;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn {
+      background: #00f2fe;
+      color: #030305;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Shift Canvas Upwards when menus open */
+    body.menu-open #dabsy-canvas {
+      transform: translateY(-15vh) scale(0.65);
+    }
   </style>
 </head>
 <body>
@@ -137,18 +232,117 @@
   <canvas id="dabsy-canvas"></canvas>
   <div id="subtitle-box"></div>
 
-  <!-- Floating Option Bubbles Menu -->
+  <!-- Floating Bubble Constellation -->
   <div id="bubble-menu">
     <div class="bubble-constellation">
-      <div class="action-bubble bubble-study" onclick="App.selectOption('Study Mode')">📚 Study Mode</div>
-      <div class="action-bubble bubble-topics" onclick="App.selectOption('Topics')">📖 Topics</div>
-      <div class="action-bubble bubble-tasks" onclick="App.selectOption('Tasks')">✅ Tasks</div>
-      <div class="action-bubble bubble-settings" onclick="App.selectOption('Settings')">⚙️ Settings</div>
-      <div class="action-bubble bubble-room" onclick="App.selectOption('D.A.B.S.y Room')">🏠 Room</div>
+      <div class="action-bubble bubble-study" onclick="App.openMode('study')">📚 Study Mode</div>
+      <div class="action-bubble bubble-topics" onclick="App.openMode('topics')">📖 Topics</div>
+      <div class="action-bubble bubble-tasks" onclick="App.openMode('tasks')">✅ Tasks</div>
+      <div class="action-bubble bubble-settings" onclick="App.openMode('settings')">⚙️ Settings</div>
+      <div class="action-bubble bubble-room" onclick="App.openMode('room')">🏠 Room</div>
+    </div>
+  </div>
+
+  <!-- Smart Modals -->
+  <div id="modal-study" class="smart-modal">
+    <div class="modal-header">
+      <h2>D.A.B.S.y Adaptive Tutor</h2>
+      <button class="close-btn" onclick="App.closeModes()">&times;</button>
+    </div>
+    <div class="modal-body" id="study-chat-history">
+      <div class="card"><strong>D.A.B.S.y:</strong> Let's build your PCMB concepts from zero. What concept or chapter are we tackling today?</div>
+    </div>
+    <div class="input-row">
+      <input type="text" id="study-input" placeholder="Ask a question or name a topic...">
+      <button class="btn" onclick="App.sendStudyQuery()">Send</button>
+    </div>
+  </div>
+
+  <div id="modal-tasks" class="smart-modal">
+    <div class="modal-header">
+      <h2>Active Tasks & Goals</h2>
+      <button class="close-btn" onclick="App.closeModes()">&times;</button>
+    </div>
+    <div class="modal-body" id="task-list-container">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="input-row">
+      <input type="text" id="new-task-input" placeholder="Add new task or reminder...">
+      <button class="btn" onclick="App.addNewTask()">Add</button>
+    </div>
+  </div>
+
+  <div id="modal-room" class="smart-modal">
+    <div class="modal-header">
+      <h2>D.A.B.S.y's World</h2>
+      <button class="close-btn" onclick="App.closeModes()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="card">🪴 <strong>Study Plant:</strong> Thriving (Streak: <span id="streak-count">4</span> days)</div>
+      <div class="card">📚 <strong>PCMB Focus:</strong> Physics (Current Electricity & Magnetism)</div>
+      <div class="card">💻 <strong>Active Project:</strong> Mentorly Ed-Tech Dashboard</div>
+    </div>
+  </div>
+
+  <div id="modal-topics" class="smart-modal">
+    <div class="modal-header">
+      <h2>Study Topics & Quick Revision</h2>
+      <button class="close-btn" onclick="App.closeModes()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="card" onclick="App.quickTopic('Current Electricity')">⚡ <strong>Physics:</strong> Current Electricity & Ohm's Law</div>
+      <div class="card" onclick="App.quickTopic('Chemical Bonding')">🧪 <strong>Chemistry:</strong> Chemical Bonding & Molecular Structure</div>
+      <div class="card" onclick="App.quickTopic('Calculus Basics')">📐 <strong>Mathematics:</strong> Limits & Derivatives</div>
+      <div class="card" onclick="App.quickTopic('Cell Cycle')">🧬 <strong>Biology:</strong> Cell Cycle and Cell Division</div>
+    </div>
+  </div>
+
+  <div id="modal-settings" class="smart-modal">
+    <div class="modal-header">
+      <h2>Companion Settings</h2>
+      <button class="close-btn" onclick="App.closeModes()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="card">
+        <label>AI Provider:</label>
+        <select id="ai-provider" style="width:100%; margin-top:8px; background:#000; color:#fff; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);">
+          <option value="gemini">Google Gemini AI</option>
+          <option value="local">Local Companion Engine</option>
+        </select>
+      </div>
+      <div class="card">
+        <label>Gemini API Key:</label>
+        <input type="password" id="api-key-input" placeholder="Enter API key..." style="width:100%; margin-top:8px; background:#000; color:#fff; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2);">
+      </div>
+      <button class="btn" onclick="App.saveSettings()">Save Preferences</button>
     </div>
   </div>
 
   <script>
+    // --- 1. PERSISTENT MEMORY & STATE ---
+    const Memory = {
+      data: {
+        profile: { name: "Swagat", streak: 4 },
+        tasks: [
+          { id: 1, name: "Physics Revision: Current Electricity", completed: false },
+          { id: 2, name: "Mentorly Dashboard UI Polish", completed: true }
+        ],
+        apiKey: localStorage.getItem('dabsy_key') || '',
+        provider: localStorage.getItem('dabsy_provider') || 'local'
+      },
+      save() {
+        localStorage.setItem('dabsy_mem', JSON.stringify(this.data));
+        localStorage.setItem('dabsy_key', this.data.apiKey);
+        localStorage.setItem('dabsy_provider', this.data.provider);
+      },
+      load() {
+        const saved = localStorage.getItem('dabsy_mem');
+        if (saved) try { this.data = JSON.parse(saved); } catch(e){}
+      }
+    };
+    Memory.load();
+
+    // --- 2. SPRING PHYSICS ENGINE ---
     class Spring {
       constructor(val, tension = 130, friction = 14) {
         this.val = val;
@@ -165,6 +359,7 @@
       }
     }
 
+    // --- 3. LAYERED EYE RENDERER ---
     class DabsyEyes {
       constructor(canvas) {
         this.canvas = canvas;
@@ -200,15 +395,13 @@
         const cx = w / 2;
         const cy = h / 2;
         const spacing = 100;
-        
-        // Exact proportions from user reference: vertical rounded pill shape with specular highlight
         const eyeWidth = 48;
         const eyeHeight = 78;
 
         this.ctx.save();
         this.ctx.translate(cx, cy);
 
-        [-spacing / 2, spacing / 2].forEach((offsetX, idx) => {
+        [-spacing / 2, spacing / 2].forEach((offsetX) => {
           this.ctx.save();
           
           const x = offsetX + this.gazeX.val;
@@ -232,13 +425,11 @@
           this.drawPill(width * 0.92, height * 0.92);
           this.ctx.fill();
 
-          // Layer 3: Cute Specular Highlight Circle (top-left inside each eye)
+          // Layer 3: Specular Highlight Dot
           this.ctx.shadowBlur = 0;
           this.ctx.fillStyle = '#ffffff';
           this.ctx.beginPath();
-          const pupilOffsetX = -width * 0.22;
-          const pupilOffsetY = -height * 0.25;
-          this.ctx.arc(pupilOffsetX, pupilOffsetY, 6.5, 0, Math.PI * 2);
+          this.ctx.arc(-width * 0.22, -height * 0.25, 6.5, 0, Math.PI * 2);
           this.ctx.fill();
 
           this.ctx.restore();
@@ -248,7 +439,7 @@
 
       drawPill(w, h) {
         this.ctx.beginPath();
-        const r = w / 2; // Fully rounded pill ends
+        const r = w / 2;
         if (this.ctx.roundRect) {
             this.ctx.roundRect(-w/2, -h/2, w, h, r);
         } else {
@@ -261,6 +452,7 @@
       }
     }
 
+    // --- 4. BEHAVIOR ENGINE ---
     class DabsyBehavior {
       constructor(eyes) {
         this.eyes = eyes;
@@ -333,6 +525,7 @@
       }
     }
 
+    // --- 5. MAIN APPLICATION CONTROLLER ---
     const App = {
       init() {
         const canvas = document.getElementById('dabsy-canvas');
@@ -349,7 +542,7 @@
         this.eyes.blink.val = 0.05;
         setTimeout(() => {
           this.eyes.blink.target = 1;
-          this.speak("...you're back. 👀");
+          this.speak(`Welcome back, ${Memory.data.profile.name}. 👀`);
         }, 900);
       },
 
@@ -373,6 +566,11 @@
             }, 300);
           }
         });
+
+        // Load settings values into modal
+        document.getElementById('ai-provider').value = Memory.data.provider;
+        document.getElementById('api-key-input').value = Memory.data.apiKey;
+        this.renderTasks();
       },
 
       toggleMenu() {
@@ -389,29 +587,36 @@
         }
       },
 
-      selectOption(optionName) {
+      openMode(modeName) {
         this.toggleMenu();
-        this.speak(`Opening ${optionName}...`);
+        document.body.classList.add('menu-open');
+        document.querySelectorAll('.smart-modal').forEach(m => m.classList.remove('active'));
+        document.getElementById(`modal-${modeName}`).classList.add('active');
+        this.behavior.setState('THINKING');
       },
 
-      speak(text) {
-        const sub = document.getElementById('subtitle-box');
-        sub.innerText = text;
-        sub.classList.add('visible');
-        this.eyes.bloom.target = 1.5;
-        setTimeout(() => {
-          sub.classList.remove('visible');
-          this.eyes.bloom.target = 1.0;
-        }, 3200);
+      closeModes() {
+        document.body.classList.remove('menu-open');
+        document.querySelectorAll('.smart-modal').forEach(m => m.classList.remove('active'));
+        this.behavior.setState('IDLE');
       },
 
-      loop() {
-        this.eyes.render();
-        requestAnimationFrame(() => this.loop());
-      }
-    };
+      async sendStudyQuery() {
+        const input = document.getElementById('study-input');
+        const history = document.getElementById('study-chat-history');
+        const q = input.value.trim();
+        if (!q) return;
 
-    window.addEventListener('load', () => App.init());
-  </script>
-</body>
-</html>
+        history.innerHTML += `<div class="card"><strong>You:</strong> ${q}</div>`;
+        input.value = '';
+        history.scrollTop = history.scrollHeight;
+
+        this.behavior.setState('THINKING');
+        
+        let response = "";
+        const key = Memory.data.apiKey;
+        const provider = Memory.data.provider;
+
+        if (provider === 'gemini' && key) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/
