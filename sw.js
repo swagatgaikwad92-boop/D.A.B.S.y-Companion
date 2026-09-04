@@ -1,14 +1,15 @@
-const CACHE_NAME = 'dabsy-v2';
+const CACHE_NAME = 'dabsy-v4-core';
 const ASSETS = [
   './index.html',
   './styles.css',
   './app.js',
-  './vision.js',
-  './ai.js',
-  './voice.js',
+  './brain.js',
   './memory.js',
-  './personality.js',
-  './behavior.js',
+  './state.js',
+  './vision.js',
+  './voice.js',
+  './study.js',
+  './room.js',
   './manifest.json',
   './assets/icon.svg'
 ];
