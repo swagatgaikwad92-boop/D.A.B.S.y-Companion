@@ -4,39 +4,427 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>D.A.B.S.y</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #030305;
+      color: #f0f0f5;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Atmospheric depth behind the creature */
+    #atmosphere {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #0a111a 0%, #030305 70%);
+      z-index: 0;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #dabsy-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 10;
+      touch-action: none;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #subtitle-box {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10, 12, 18, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 14px 28px;
+      border-radius: 20px;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 15;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    #subtitle-box.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* The Expanded World - Hidden by default */
+    #dabsy-world {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .world-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform: scale(0.9) translateY(40px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(20, 25, 35, 0.6), rgba(10, 12, 18, 0.9));
+      border: 1px solid rgba(0, 242, 254, 0.15);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .panel h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #00f2fe;
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+
+    .item, .task {
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* World Active State */
+    body.world-open #atmosphere {
+      opacity: 0.2;
+    }
+
+    body.world-open #dabsy-canvas {
+      transform: scale(0.35) translateY(-55vh);
+    }
+
+    body.world-open #dabsy-world {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    body.world-open .world-content {
+      transform: scale(1) translateY(12vh);
+    }
+  </style>
 </head>
 <body>
-  <!-- The Minimal Default State: Only Atmosphere and Eyes -->
+
+  <!-- Minimal Default State -->
   <div id="atmosphere"></div>
   <canvas id="dabsy-canvas"></canvas>
   <div id="subtitle-box"></div>
 
-  <!-- The Expanded World (Revealed on Double Tap) -->
+  <!-- Expanded World (Revealed on Double Tap) -->
   <div id="dabsy-world">
     <div class="world-content">
-      <div class="panel room-panel">
+      <div class="panel">
         <h2>D.A.B.S.y's Space</h2>
-        <div class="env-items">
-          <div class="item">🪴 Study Plant</div>
-          <div class="item">📚 PCMB Textbooks</div>
-          <div class="item">💻 Mentorly Dashboard Code</div>
-        </div>
+        <div class="item">🪴 <span>Study Plant (Streak: 4)</span></div>
+        <div class="item">📚 <span>PCMB Textbooks</span></div>
+        <div class="item">💻 <span>Mentorly Dashboard</span></div>
       </div>
-      <div class="panel task-panel">
+      <div class="panel">
         <h2>Active Focus</h2>
-        <ul id="task-list">
-          <li class="task">Physics Revision: Current Electricity</li>
-          <li class="task">UI Layout Adjustments</li>
-        </ul>
+        <div class="task">⭕ <span>Physics: Current Electricity</span></div>
+        <div class="task">⭕ <span>UI Layout Adjustments</span></div>
       </div>
     </div>
   </div>
 
-  <script src="physics.js"></script>
-  <script src="memory.js"></script>
-  <script src="eyes.js"></script>
-  <script src="behavior.js"></script>
-  <script src="app.js"></script>
+  <script>
+    // --- 1. PHYSICS ENGINE ---
+    class Spring {
+      constructor(val, tension = 120, friction = 14) {
+        this.val = val;
+        this.target = val;
+        this.vel = 0;
+        this.tension = tension;
+        this.friction = friction;
+      }
+      update(dt = 0.016) {
+        const force = (this.target - this.val) * this.tension;
+        this.vel += (force - this.vel * this.friction) * dt;
+        this.val += this.vel * dt;
+        return this.val;
+      }
+    }
+
+    // --- 2. RENDER ENGINE ---
+    class DabsyEyes {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        
+        this.gazeX = new Spring(0, 100, 12);
+        this.gazeY = new Spring(0, 100, 12);
+        this.blink = new Spring(1, 240, 18);
+        this.squash = new Spring(1, 140, 12); 
+        this.bloom = new Spring(1, 80, 20); 
+        
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth * window.devicePixelRatio;
+        this.canvas.height = window.innerHeight * window.devicePixelRatio;
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+
+      render() {
+        this.gazeX.update();
+        this.gazeY.update();
+        this.blink.update();
+        this.squash.update();
+        this.bloom.update();
+
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        this.ctx.clearRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const spacing = 110;
+        const baseWidth = 60;
+        const baseHeight = 75;
+
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+
+        [-spacing, spacing].forEach(offsetX => {
+          this.ctx.save();
+          
+          const x = offsetX + this.gazeX.val;
+          const y = this.gazeY.val;
+          const width = baseWidth * (2 - this.squash.val);
+          const height = baseHeight * Math.max(0.05, this.blink.val) * this.squash.val;
+          
+          this.ctx.translate(x, y);
+
+          // Layer 1: Atmospheric bloom
+          this.ctx.shadowColor = `rgba(0, 242, 254, ${0.4 * this.bloom.val})`;
+          this.ctx.shadowBlur = 90;
+          this.ctx.fillStyle = 'rgba(0, 242, 254, 0.1)';
+          this.drawSquircle(width, height);
+          this.ctx.fill();
+
+          // Layer 2: Inner glow
+          this.ctx.globalCompositeOperation = 'screen';
+          this.ctx.shadowColor = `rgba(0, 242, 254, ${0.7 * this.bloom.val})`;
+          this.ctx.shadowBlur = 25;
+          this.ctx.fillStyle = 'rgba(0, 242, 254, 0.6)';
+          this.drawSquircle(width * 0.85, height * 0.85);
+          this.ctx.fill();
+
+          // Layer 3: Luminous Core
+          this.ctx.shadowColor = '#ffffff';
+          this.ctx.shadowBlur = 12;
+          this.ctx.fillStyle = '#ffffff';
+          this.drawSquircle(width * 0.5, height * 0.5);
+          this.ctx.fill();
+
+          this.ctx.restore();
+        });
+        this.ctx.restore();
+      }
+
+      drawSquircle(w, h) {
+        this.ctx.beginPath();
+        if (this.ctx.roundRect) {
+            this.ctx.roundRect(-w/2, -h/2, w, h, 28);
+        } else {
+            // Fallback for older WebViews
+            const r = 28;
+            this.ctx.moveTo(-w/2 + r, -h/2);
+            this.ctx.arcTo(w/2, -h/2, w/2, h/2, r);
+            this.ctx.arcTo(w/2, h/2, -w/2, h/2, r);
+            this.ctx.arcTo(-w/2, h/2, -w/2, -h/2, r);
+            this.ctx.arcTo(-w/2, -h/2, w/2, -h/2, r);
+        }
+      }
+    }
+
+    // --- 3. BEHAVIOR ENGINE ---
+    class DabsyBehavior {
+      constructor(eyes) {
+        this.eyes = eyes;
+        this.state = 'IDLE';
+        this.lifeLoop();
+        this.breathingLoop();
+      }
+
+      setState(newState) {
+        this.state = newState;
+        if (newState === 'THINKING') {
+          this.eyes.squash.target = 0.85; 
+          this.eyes.bloom.target = 1.3;
+        } else if (newState === 'HAPPY') {
+          this.eyes.squash.target = 0.7; 
+          this.eyes.blink.target = 0.8;
+          this.eyes.bloom.target = 1.2;
+        } else if (newState === 'IDLE') {
+          this.eyes.squash.target = 1;
+          this.eyes.blink.target = 1;
+          this.eyes.gazeX.target = 0;
+          this.eyes.gazeY.target = 0;
+        }
+      }
+
+      triggerBlink(speed = 1) {
+        this.eyes.blink.target = 0.05;
+        setTimeout(() => {
+          if (this.state !== 'SLEEPY') this.eyes.blink.target = 1;
+        }, 120 * speed);
+      }
+
+      lifeLoop() {
+        if (this.state === 'IDLE' && Math.random() > 0.4) {
+          if (Math.random() > 0.6) {
+            this.triggerBlink();
+            if (Math.random() > 0.8) setTimeout(() => this.triggerBlink(0.8), 200); 
+          } else {
+            // Micro-looks around the screen
+            this.eyes.gazeX.target = (Math.random() - 0.5) * 20;
+            this.eyes.gazeY.target = (Math.random() - 0.5) * 15;
+            setTimeout(() => {
+              if (this.state === 'IDLE') {
+                this.eyes.gazeX.target = 0;
+                this.eyes.gazeY.target = 0;
+              }
+            }, 800 + Math.random() * 1000);
+          }
+        }
+        setTimeout(() => this.lifeLoop(), 2000 + Math.random() * 3000);
+      }
+
+      breathingLoop() {
+        if (this.state === 'IDLE' || this.state === 'THINKING') {
+          this.eyes.bloom.target = this.eyes.bloom.target > 1.0 ? 0.9 : 1.1;
+        }
+        setTimeout(() => this.breathingLoop(), 1800);
+      }
+
+      reactToTouch(x, y) {
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        this.eyes.gazeX.target = Math.max(-60, Math.min(60, (x - cx) * 0.15));
+        this.eyes.gazeY.target = Math.max(-40, Math.min(40, (y - cy) * 0.15));
+        this.eyes.bloom.target = 1.4;
+        this.triggerBlink();
+        
+        clearTimeout(this.resetTimer);
+        this.resetTimer = setTimeout(() => this.setState('IDLE'), 1500);
+      }
+    }
+
+    // --- 4. MAIN APP ---
+    const App = {
+      init() {
+        const canvas = document.getElementById('dabsy-canvas');
+        this.eyes = new DabsyEyes(canvas);
+        this.behavior = new DabsyBehavior(this.eyes);
+        
+        this.isWorldOpen = false;
+        this.lastTap = 0;
+        this.tapTimer = null;
+
+        this.setupInteractions();
+        this.loop();
+        
+        // Initial Wake Sequence
+        this.eyes.blink.val = 0.05;
+        setTimeout(() => {
+          this.eyes.blink.target = 1;
+          this.speak("...you're back. 👀");
+        }, 1000);
+      },
+
+      setupInteractions() {
+        const canvas = document.getElementById('dabsy-canvas');
+        
+        canvas.addEventListener('pointerup', (e) => {
+          e.preventDefault();
+          const now = Date.now();
+          
+          if (now - this.lastTap < 400) {
+            // DOUBLE TAP: Clear the single tap timer and toggle world
+            clearTimeout(this.tapTimer);
+            this.toggleWorld();
+            this.lastTap = 0; 
+          } else {
+            this.lastTap = now;
+            // SINGLE TAP: Buffer the reaction slightly to wait for a potential double tap
+            this.tapTimer = setTimeout(() => {
+              if (!this.isWorldOpen) {
+                this.behavior.reactToTouch(e.clientX, e.clientY);
+              }
+            }, 300);
+          }
+        });
+      },
+
+      toggleWorld() {
+        this.isWorldOpen = !this.isWorldOpen;
+        if (this.isWorldOpen) {
+          document.body.classList.add('world-open');
+          this.behavior.setState('THINKING'); 
+          this.eyes.bloom.target = 0.7; // Dim slightly while focused on the menu
+        } else {
+          document.body.classList.remove('world-open');
+          this.behavior.setState('IDLE');
+        }
+      },
+
+      speak(text) {
+        const sub = document.getElementById('subtitle-box');
+        sub.innerText = text;
+        sub.classList.add('visible');
+        this.eyes.bloom.target = 1.5;
+        setTimeout(() => {
+          sub.classList.remove('visible');
+          this.eyes.bloom.target = 1.0;
+        }, 3500);
+      },
+
+      loop() {
+        this.eyes.render();
+        requestAnimationFrame(() => this.loop());
+      }
+    };
+
+    window.addEventListener('load', () => App.init());
+  </script>
 </body>
 </html>
