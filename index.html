@@ -9,67 +9,24 @@
 </head>
 <body>
   <div id="app-container">
-    <header class="hud-header">
-      <div class="status-pill">
-        <span id="mood-indicator" class="dot"></span>
-        <span id="state-label">IDLE</span>
-      </div>
-      <div class="hud-controls">
-        <button id="vision-toggle" class="hud-btn" title="Toggle Vision">👁️ <span id="vision-status">OFF</span></button>
-        <button id="study-toggle" class="hud-btn" title="Toggle Study Mode">📚</button>
-        <button id="settings-btn" class="hud-btn" title="Settings">⚙️</button>
-      </div>
-    </header>
-
+    <!-- Minimal Default Home Screen: ONLY EYES -->
     <main id="creature-stage">
       <canvas id="eye-canvas"></canvas>
       <div id="subtitle-box" class="hidden"></div>
       <video id="webcam-feed" autoplay playsinline muted class="hidden"></video>
     </main>
 
-    <section id="study-panel" class="hidden">
-      <div class="study-header">
-        <h3>Study Companion</h3>
-        <button id="close-study" class="close-btn">&times;</button>
-      </div>
-      <div id="study-chat-history" class="study-chat"></div>
-      <div class="study-input-row">
-        <input type="text" id="study-input" placeholder="Ask D.A.B.S.y a concept...">
-        <button id="study-send" class="hud-btn">Send</button>
-        <button id="study-snap" class="hud-btn" title="Analyze image/work">📸</button>
-      </div>
-    </section>
-
-    <footer class="interaction-bar">
-      <button id="mic-btn" class="action-btn" title="Voice Input">🎤</button>
-      <div class="creature-info">D.A.B.S.y v1.0</div>
-      <button id="pet-btn" class="action-btn" title="Interact">🐾</button>
-    </footer>
-  </div>
-
-  <div id="settings-modal" class="modal hidden">
-    <div class="modal-content">
-      <h3>D.A.B.S.y Settings</h3>
-      <label>AI API Provider:</label>
-      <select id="ai-provider">
-        <option value="gemini">Google Gemini</option>
-        <option value="local">Local Simulation (No Key)</option>
-      </select>
-      <label>API Key:</label>
-      <input type="password" id="api-key-input" placeholder="Enter API key...">
-      <div class="modal-buttons">
-        <button id="save-settings" class="hud-btn primary">Save</button>
-        <button id="close-settings" class="hud-btn">Cancel</button>
-      </div>
-    </div>
+    <!-- Expanded D.A.B.S.y World Modal (Opened via Double Tap) -->
+    <div id="expanded-world" class="modal hidden"></div>
   </div>
 
   <script src="memory.js"></script>
-  <script src="personality.js"></script>
-  <script src="behavior.js"></script>
-  <script src="ai.js"></script>
-  <script src="voice.js"></script>
+  <script src="state.js"></script>
+  <script src="brain.js"></script>
+  <script src="study.js"></script>
   <script src="vision.js"></script>
+  <script src="voice.js"></script>
+  <script src="room.js"></script>
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
