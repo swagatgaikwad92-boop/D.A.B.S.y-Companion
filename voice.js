@@ -6,19 +6,20 @@ const VoiceSystem = {
   init(onResult) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = false;
-      this.recognition.interimResults = false;
-      this.recognition.lang = 'en-US';
+      try {
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        this.recognition.lang = 'en-US';
 
-      this.recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        this.isListening = false;
-        if (onResult) onResult(text);
-      };
-
-      this.recognition.onerror = () => { this.isListening = false; };
-      this.recognition.onend = () => { this.isListening = false; };
+        this.recognition.onresult = (event) => {
+          const text = event.results[0][0].transcript;
+          this.isListening = false;
+          if (onResult) onResult(text);
+        };
+        this.recognition.onerror = () => { this.isListening = false; };
+        this.recognition.onend = () => { this.isListening = false; };
+      } catch (e) {}
     }
   },
 
@@ -48,12 +49,15 @@ const VoiceSystem = {
       if (onEnd) onEnd();
       return;
     }
-    this.synth.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.pitch = 1.4; // Cute robotic/creature pitch
-    utterance.rate = 1.1;
-    utterance.onend = () => { if (onEnd) onEnd(); };
-    this.synth.speak(utterance);
+    try {
+      this.synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 1.4;
+      utterance.rate = 1.1;
+      utterance.onend = () => { if (onEnd) onEnd(); };
+      this.synth.speak(utterance);
+    } catch(e) {
+      if (onEnd) onEnd();
+    }
   }
 };
-
