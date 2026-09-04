@@ -4,34 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>D.A.B.S.y</title>
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="app-container">
-    <!-- Minimal Default Home Screen: ONLY EYES -->
-    <main id="creature-stage">
-      <canvas id="eye-canvas"></canvas>
-      <div id="subtitle-box" class="hidden"></div>
-      <video id="webcam-feed" autoplay playsinline muted class="hidden"></video>
-    </main>
+  <!-- The Minimal Default State: Only Atmosphere and Eyes -->
+  <div id="atmosphere"></div>
+  <canvas id="dabsy-canvas"></canvas>
+  <div id="subtitle-box"></div>
 
-    <!-- Expanded D.A.B.S.y World Modal (Opened via Double Tap) -->
-    <div id="expanded-world" class="modal hidden"></div>
+  <!-- The Expanded World (Revealed on Double Tap) -->
+  <div id="dabsy-world">
+    <div class="world-content">
+      <div class="panel room-panel">
+        <h2>D.A.B.S.y's Space</h2>
+        <div class="env-items">
+          <div class="item">🪴 Study Plant</div>
+          <div class="item">📚 PCMB Textbooks</div>
+          <div class="item">💻 Mentorly Dashboard Code</div>
+        </div>
+      </div>
+      <div class="panel task-panel">
+        <h2>Active Focus</h2>
+        <ul id="task-list">
+          <li class="task">Physics Revision: Current Electricity</li>
+          <li class="task">UI Layout Adjustments</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
+  <script src="physics.js"></script>
   <script src="memory.js"></script>
-  <script src="state.js"></script>
-  <script src="brain.js"></script>
-  <script src="study.js"></script>
-  <script src="vision.js"></script>
-  <script src="voice.js"></script>
-  <script src="room.js"></script>
+  <script src="eyes.js"></script>
+  <script src="behavior.js"></script>
   <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-  </script>
 </body>
 </html>
